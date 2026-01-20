@@ -1,0 +1,110 @@
+/* ===== TRUST BADGES ===== */
+.trust-badges {
+  padding: 24px 0;
+  background: var(--bg-light);
+  border-bottom: 1px solid #E8E8E8;
+}
+
+.badges-grid {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.badge-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+}
+
+.badge-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.badge-icon {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(0, 212, 170, 0.1), rgba(0, 212, 170, 0.2));
+  border-radius: 10px;
+  color: var(--primary);
+}
+
+.badge-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.badge-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--secondary);
+  line-height: 1.2;
+}
+
+.badge-label {
+  font-size: 0.8rem;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .badges-grid {
+    gap: 20px;
+  }
+
+  .badge-item {
+    flex: 1;
+    min-width: 180px;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .trust-badges {
+    padding: 20px 0;
+  }
+
+  .badges-grid {
+    gap: 12px;
+  }
+
+  .badge-item {
+    min-width: 150px;
+    padding: 10px 14px;
+  }
+
+  .badge-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .badge-value {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .badge-item {
+    min-width: 140px;
+    flex-direction: column;
+    text-align: center;
+    padding: 16px 12px;
+  }
+
+  .badge-icon {
+    margin-bottom: 8px;
+  }
+}

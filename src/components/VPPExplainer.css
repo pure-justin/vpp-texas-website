@@ -202,6 +202,7 @@
 @media (max-width: 768px) {
   .vpp-explainer {
     padding: 60px 0;
+    background: linear-gradient(180deg, #0d1424 0%, #0a0f1a 100%);
   }
 
   .vpp-explainer h2 {
@@ -210,7 +211,12 @@
   }
 
   .tabs-container {
-    padding: 16px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
   }
 
   .tabs-nav {
@@ -221,6 +227,15 @@
   .tab-btn {
     justify-content: flex-start;
     padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .tab-btn.active {
+    background: linear-gradient(135deg, #00D4AA 0%, #00B894 100%);
+    border-color: transparent;
+    color: #0a0f1a;
+    box-shadow: 0 0 25px rgba(0, 212, 170, 0.3);
   }
 
   .tab-content h3 {
@@ -229,14 +244,30 @@
 
   .stat-bubble {
     padding: 10px 14px;
+    background: rgba(10, 15, 26, 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 212, 170, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
   }
 
   .stat-value {
     font-size: 1.1rem;
+    color: #00D4AA;
   }
 
   .stat-label {
     font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .explainer-image {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  }
+
+  .tab-content .check-icon {
+    color: #00D4AA;
   }
 }
 

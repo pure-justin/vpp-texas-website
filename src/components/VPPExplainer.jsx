@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Check, Zap, Heart, Users } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import './VPPExplainer.css'
 
 function VPPExplainer() {
@@ -50,62 +51,157 @@ function VPPExplainer() {
     }
   ]
 
+  const contentVariants = {
+    hidden: { opacity: 0, x: 20 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: { duration: 0.4, ease: "easeOut" }
+    },
+    exit: {
+      opacity: 0,
+      x: -20,
+      transition: { duration: 0.3 }
+    }
+  }
+
+  const bulletVariants = {
+    hidden: { opacity: 0, x: -20 },
+    visible: (i) => ({
+      opacity: 1,
+      x: 0,
+      transition: {
+        delay: i * 0.1 + 0.2,
+        type: "spring",
+        stiffness: 100
+      }
+    })
+  }
+
+  const bubbleVariants = {
+    hidden: { scale: 0, opacity: 0 },
+    visible: (i) => ({
+      scale: 1,
+      opacity: 1,
+      transition: {
+        delay: i * 0.2 + 0.3,
+        type: "spring",
+        stiffness: 150
+      }
+    })
+  }
+
   return (
     <section className="vpp-explainer">
       <div className="container">
-        <div className="explainer-grid">
-          <div className="explainer-image">
+        <motion.div
+          className="explainer-grid"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <motion.div
+            className="explainer-image"
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, ease: "easeOut" }}
+          >
             <img src="/images/power-grid.jpg" alt="Virtual Power Plant network visualization" />
             <div className="image-overlay"></div>
             <div className="stat-bubbles">
-              <div className="stat-bubble stat-1">
-                <span className="stat-value">10,000+</span>
-                <span className="stat-label">Connected Homes</span>
-              </div>
-              <div className="stat-bubble stat-2">
-                <span className="stat-value">50 MW</span>
-                <span className="stat-label">Grid Support</span>
-              </div>
-              <div className="stat-bubble stat-3">
-                <span className="stat-value">99.9%</span>
-                <span className="stat-label">Uptime</span>
-              </div>
+              {[
+                { value: '10,000+', label: 'Connected Homes', className: 'stat-1' },
+                { value: '50 MW', label: 'Grid Support', className: 'stat-2' },
+                { value: '99.9%', label: 'Uptime', className: 'stat-3' }
+              ].map((stat, i) => (
+                <motion.div
+                  className={`stat-bubble ${stat.className}`}
+                  key={i}
+                  custom={i}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  variants={bubbleVariants}
+                  whileHover={{
+                    scale: 1.1,
+                    transition: { type: "spring", stiffness: 300 }
+                  }}
+                >
+                  <span className="stat-value">{stat.value}</span>
+                  <span className="stat-label">{stat.label}</span>
+                </motion.div>
+              ))}
             </div>
-          </div>
+          </motion.div>
 
-          <div className="explainer-content">
+          <motion.div
+            className="explainer-content"
+            initial={{ opacity: 0, x: 50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, ease: "easeOut", delay: 0.2 }}
+          >
             <span className="section-tag">Understanding VPP</span>
             <h2>The Future of <span className="highlight">Home Energy</span></h2>
 
             <div className="tabs-container">
               <div className="tabs-nav">
                 {tabs.map((tab, index) => (
-                  <button
+                  <motion.button
                     key={index}
                     className={`tab-btn ${activeTab === index ? 'active' : ''}`}
                     onClick={() => setActiveTab(index)}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                   >
-                    <tab.icon size={20} />
+                    <motion.span
+                      animate={activeTab === index ? { rotate: [0, -10, 10, 0] } : {}}
+                      transition={{ duration: 0.5 }}
+                    >
+                      <tab.icon size={20} />
+                    </motion.span>
                     <span>{tab.title}</span>
-                  </button>
+                  </motion.button>
                 ))}
               </div>
 
-              <div className="tab-content">
-                <h3>{tabs[activeTab].content.heading}</h3>
-                <p>{tabs[activeTab].content.text}</p>
-                <ul>
-                  {tabs[activeTab].content.bullets.map((bullet, index) => (
-                    <li key={index}>
-                      <Check size={18} className="check-icon" />
-                      <span>{bullet}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeTab}
+                  className="tab-content"
+                  variants={contentVariants}
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                >
+                  <h3>{tabs[activeTab].content.heading}</h3>
+                  <p>{tabs[activeTab].content.text}</p>
+                  <ul>
+                    {tabs[activeTab].content.bullets.map((bullet, index) => (
+                      <motion.li
+                        key={index}
+                        custom={index}
+                        initial="hidden"
+                        animate="visible"
+                        variants={bulletVariants}
+                      >
+                        <motion.span
+                          whileHover={{ scale: 1.2, rotate: 360 }}
+                          transition={{ duration: 0.3 }}
+                        >
+                          <Check size={18} className="check-icon" />
+                        </motion.span>
+                        <span>{bullet}</span>
+                      </motion.li>
+                    ))}
+                  </ul>
+                </motion.div>
+              </AnimatePresence>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
     </section>
   )

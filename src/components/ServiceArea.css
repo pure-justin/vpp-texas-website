@@ -201,10 +201,24 @@
 @media (max-width: 768px) {
   .service-area {
     padding: 60px 0;
+    background: linear-gradient(180deg, #0a0f1a 0%, #0d1424 100%);
+  }
+
+  .service-area .section-header h2 {
+    color: #ffffff;
+  }
+
+  .service-area .section-header p {
+    color: rgba(255, 255, 255, 0.6);
   }
 
   .service-info h3 {
     font-size: 1.5rem;
+    color: #ffffff;
+  }
+
+  .service-info > p {
+    color: rgba(255, 255, 255, 0.6);
   }
 
   .areas-list {
@@ -213,16 +227,31 @@
   }
 
   .area-item {
-    padding: 12px 14px;
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
   }
 
-  .checker-form {
-    flex-direction: column;
+  .area-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: none;
+    transform: none;
   }
 
-  .checker-form button {
-    width: 100%;
-    justify-content: center;
+  .area-item span:last-child {
+    color: #ffffff;
+  }
+
+  .map-visual {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  }
+
+  .map-overlay {
+    background: linear-gradient(135deg, rgba(0, 212, 170, 0.15) 0%, transparent 50%);
   }
 
   .coverage-badges {
@@ -235,10 +264,55 @@
   .coverage-badge {
     padding: 8px 12px;
     font-size: 0.8rem;
+    background: rgba(10, 15, 26, 0.9);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 212, 170, 0.3);
+    color: #ffffff;
+  }
+
+  .badge-dot {
+    background: #00D4AA;
+    box-shadow: 0 0 10px rgba(0, 212, 170, 0.5);
+  }
+
+  .checker-form {
+    flex-direction: column;
+  }
+
+  .checker-form button {
+    width: 100%;
+    justify-content: center;
   }
 
   .eligibility-checker {
-    padding: 20px;
+    padding: 24px;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+  }
+
+  .eligibility-checker h4 {
+    color: #ffffff;
+  }
+
+  .checker-subtitle {
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .eligible-cta {
+    background: rgba(0, 212, 170, 0.1);
+    border: 1px solid rgba(0, 212, 170, 0.25);
+  }
+
+  .eligible-cta p {
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .cta-btn {
+    box-shadow: 0 0 25px rgba(0, 212, 170, 0.3);
   }
 }
 

@@ -46,6 +46,9 @@ export async function submitLead(leadData) {
       })
     }
 
+    // Email/SMS notifications are handled automatically by Firebase Cloud Function
+    // (onNewLeadCreated trigger fires when this document is created)
+
     return { success: true, id: docRef.id }
   } catch (error) {
     console.error('Error submitting lead:', error)

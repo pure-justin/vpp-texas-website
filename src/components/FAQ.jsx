@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { ChevronDown, MessageCircle, Phone } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import './FAQ.css'
 
 function FAQ() {
@@ -40,52 +41,158 @@ function FAQ() {
     }
   ]
 
+  const headerVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6, ease: "easeOut" }
+    }
+  }
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.08,
+        delayChildren: 0.2
+      }
+    }
+  }
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        type: "spring",
+        stiffness: 100,
+        damping: 15
+      }
+    }
+  }
+
+  const answerVariants = {
+    hidden: {
+      height: 0,
+      opacity: 0,
+      transition: {
+        height: { duration: 0.3 },
+        opacity: { duration: 0.2 }
+      }
+    },
+    visible: {
+      height: "auto",
+      opacity: 1,
+      transition: {
+        height: { duration: 0.3 },
+        opacity: { duration: 0.3, delay: 0.1 }
+      }
+    }
+  }
+
   return (
     <section className="faq" id="faq">
       <div className="container">
-        <div className="section-header">
+        <motion.div
+          className="section-header"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={headerVariants}
+        >
           <span className="section-tag">Common Questions</span>
           <h2>Frequently Asked <span className="highlight">Questions</span></h2>
           <p>Everything you need to know about joining Texas's Virtual Power Plant</p>
-        </div>
+        </motion.div>
 
         <div className="faq-grid">
-          <div className="faq-list">
+          <motion.div
+            className="faq-list"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            variants={containerVariants}
+          >
             {faqs.map((faq, index) => (
-              <div
+              <motion.div
                 key={index}
                 className={`faq-item ${openIndex === index ? 'open' : ''}`}
+                variants={itemVariants}
               >
-                <button
+                <motion.button
                   className="faq-question"
                   onClick={() => setOpenIndex(openIndex === index ? -1 : index)}
+                  whileHover={{ x: 4 }}
+                  whileTap={{ scale: 0.99 }}
                 >
                   <span>{faq.question}</span>
-                  <span className="faq-toggle">
+                  <motion.span
+                    className="faq-toggle"
+                    animate={{ rotate: openIndex === index ? 180 : 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
                     <ChevronDown size={20} />
-                  </span>
-                </button>
-                <div className="faq-answer">
-                  <p>{faq.answer}</p>
-                </div>
-              </div>
+                  </motion.span>
+                </motion.button>
+                <AnimatePresence>
+                  {openIndex === index && (
+                    <motion.div
+                      className="faq-answer"
+                      initial="hidden"
+                      animate="visible"
+                      exit="hidden"
+                      variants={answerVariants}
+                    >
+                      <p>{faq.answer}</p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
 
-          <div className="faq-cta">
-            <div className="cta-card">
-              <div className="cta-icon">
+          <motion.div
+            className="faq-cta"
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          >
+            <motion.div
+              className="cta-card"
+              whileHover={{ y: -5, boxShadow: "0 20px 40px rgba(0,0,0,0.1)" }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              <motion.div
+                className="cta-icon"
+                animate={{
+                  y: [0, -5, 0],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              >
                 <MessageCircle size={32} />
-              </div>
+              </motion.div>
               <h3>Still Have Questions?</h3>
               <p>Our energy experts are ready to help. Get personalized answers about your home and situation.</p>
-              <a href="tel:+12544104104" className="cta-phone">
+              <motion.a
+                href="tel:+12544104104"
+                className="cta-phone"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
                 <Phone size={20} />
                 <span>(254) 410-4104</span>
-              </a>
+              </motion.a>
               <span className="cta-hours">Mon-Fri: 8am-8pm | Sat: 9am-5pm</span>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
       </div>
     </section>

@@ -171,7 +171,7 @@
   color: var(--primary);
 }
 
-/* Responsive */
+/* ===== MOBILE FOOTER - Professional & Clean ===== */
 @media (max-width: 992px) {
   .footer-top {
     grid-template-columns: 1fr;
@@ -194,41 +194,92 @@
 
 @media (max-width: 768px) {
   .footer {
-    padding: 60px 0 0;
+    padding: 0;
+    background: #060a12;
   }
 
-  .footer-links {
-    grid-template-columns: 1fr;
-    gap: 30px;
+  .footer-top {
+    display: flex;
+    flex-direction: column;
+    padding: 40px 0 0;
+    border-bottom: none;
+    gap: 0;
+  }
+
+  /* Brand section - elegant and centered */
+  .footer-brand {
     text-align: center;
+    padding: 0 20px 32px;
+    max-width: none;
   }
 
-  .link-group button:hover,
-  .link-group a:hover {
-    padding-left: 0;
-  }
-
-  .contact-link {
+  .footer-brand .logo {
     justify-content: center;
+    margin-bottom: 12px;
   }
 
-  .link-group address {
-    justify-content: center;
+  .footer-brand .logo-icon {
+    display: none;
   }
 
+  .footer-brand .logo-text {
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+
+  .footer-brand p {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.35);
+    line-height: 1.5;
+    margin-bottom: 0;
+    max-width: 260px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Hide social links on mobile */
+  .social-links {
+    display: none;
+  }
+
+  /* Hide all the messy link groups */
+  .footer-links {
+    display: none;
+  }
+
+  /* Hide certifications */
   .footer-certifications {
-    flex-wrap: wrap;
-    gap: 24px;
+    display: none;
   }
 
+  /* Bottom - minimal and elegant */
   .footer-bottom {
     flex-direction: column;
     text-align: center;
+    gap: 20px;
+    padding: 24px 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+    padding-bottom: max(24px, calc(env(safe-area-inset-bottom) + 100px));
+  }
+
+  .footer-bottom p {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.2);
+    order: 2;
   }
 
   .legal-links {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 16px;
+    order: 1;
+    gap: 24px;
+  }
+
+  .legal-links a {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.3);
+  }
+
+  .legal-links a:active {
+    color: #00D4AA;
   }
 }

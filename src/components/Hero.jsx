@@ -2,11 +2,90 @@ import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import { submitLead } from '../services/firebase'
 import { checkVPPEligibility, parseGoogleAddress } from '../services/utilityService'
 import useGoogleMaps from '../hooks/useGoogleMaps'
-import { Zap, DollarSign, Calendar, Lock, CheckCircle, Phone, ArrowRight, Loader2, Home, Clock, Battery, Shield, Star, Users } from 'lucide-react'
+import { Zap, DollarSign, Calendar, Lock, CheckCircle, Phone, ArrowRight, Loader2, Home, Clock, Battery, Shield, Star, Users, Sparkles } from 'lucide-react'
 import './Hero.css'
+
+// Sound effects using Web Audio API
+const useSound = () => {
+  const audioContextRef = useRef(null)
+
+  const getContext = () => {
+    if (!audioContextRef.current) {
+      audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)()
+    }
+    return audioContextRef.current
+  }
+
+  const playTap = () => {
+    try {
+      const ctx = getContext()
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
+      osc.connect(gain)
+      gain.connect(ctx.destination)
+      osc.frequency.value = 600
+      osc.type = 'sine'
+      gain.gain.setValueAtTime(0.1, ctx.currentTime)
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1)
+      osc.start(ctx.currentTime)
+      osc.stop(ctx.currentTime + 0.1)
+    } catch (e) {}
+  }
+
+  const playSuccess = () => {
+    try {
+      const ctx = getContext()
+      const notes = [523, 659, 784] // C5, E5, G5 chord
+      notes.forEach((freq, i) => {
+        const osc = ctx.createOscillator()
+        const gain = ctx.createGain()
+        osc.connect(gain)
+        gain.connect(ctx.destination)
+        osc.frequency.value = freq
+        osc.type = 'sine'
+        gain.gain.setValueAtTime(0.08, ctx.currentTime + i * 0.1)
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.1 + 0.3)
+        osc.start(ctx.currentTime + i * 0.1)
+        osc.stop(ctx.currentTime + i * 0.1 + 0.3)
+      })
+    } catch (e) {}
+  }
+
+  const playWhoosh = () => {
+    try {
+      const ctx = getContext()
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
+      const filter = ctx.createBiquadFilter()
+      osc.connect(filter)
+      filter.connect(gain)
+      gain.connect(ctx.destination)
+      osc.type = 'sawtooth'
+      osc.frequency.setValueAtTime(200, ctx.currentTime)
+      osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.15)
+      filter.type = 'lowpass'
+      filter.frequency.value = 1000
+      gain.gain.setValueAtTime(0.05, ctx.currentTime)
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2)
+      osc.start(ctx.currentTime)
+      osc.stop(ctx.currentTime + 0.2)
+    } catch (e) {}
+  }
+
+  return { playTap, playSuccess, playWhoosh }
+}
+
+// Haptic feedback
+const haptic = (style = 'light') => {
+  if ('vibrate' in navigator) {
+    navigator.vibrate(style === 'heavy' ? 20 : 10)
+  }
+}
 
 function Hero() {
   const { isLoaded: mapsLoaded } = useGoogleMaps()
+  const { playTap, playSuccess, playWhoosh } = useSound()
+  const [journeyPath, setJourneyPath] = useState(null) // null = choosing, 'savings' | 'protection' | 'freedom'
   const [step, setStep] = useState(1) // 1 = qualification, 2 = contact, 3 = schedule, 4 = success
   const [questionStep, setQuestionStep] = useState(1) // 1 = address, 2 = homeowner, 3 = solar, 4 = credit
   const [contactStep, setContactStep] = useState(1) // 1 = name, 2 = phone, 3 = email
@@ -21,8 +100,41 @@ function Hero() {
     hasSolar: null,
     creditComfort: null,
     appointmentDay: null,
-    appointmentTime: null
+    appointmentTime: null,
+    journeyPath: null
   })
+
+  // Journey path messaging
+  const journeyContent = {
+    savings: {
+      badge: 'SAVINGS PATH',
+      headline: 'Stop Overpaying for Electricity',
+      subtext: 'Texas homeowners are saving $200+/month',
+      formTitle: 'Calculate Your Savings',
+      formSubtitle: 'See how much you could save with a free battery system'
+    },
+    protection: {
+      badge: 'PROTECTION PATH',
+      headline: 'Never Lose Power Again',
+      subtext: 'Blackouts don\'t have to leave you in the dark',
+      formTitle: 'Get Protected',
+      formSubtitle: 'Check if your home qualifies for free backup power'
+    },
+    freedom: {
+      badge: 'FREEDOM PATH',
+      headline: 'Own Your Energy Future',
+      subtext: 'Break free from the grid\'s control',
+      formTitle: 'Claim Your Independence',
+      formSubtitle: 'See if you qualify for a free home battery'
+    }
+  }
+
+  const selectJourney = (path) => {
+    playWhoosh()
+    haptic('heavy')
+    setJourneyPath(path)
+    setFormData(prev => ({ ...prev, journeyPath: path }))
+  }
   const [isChecking, setIsChecking] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [eligibilityResult, setEligibilityResult] = useState(null)
@@ -33,6 +145,20 @@ function Hero() {
   const [skipGeolocation, setSkipGeolocation] = useState(false) // Skip geolocation after user interaction
   const addressInputRef = useRef(null)
   const autocompleteRef = useRef(null)
+
+  // Listen for showEligibilityForm event from StickyBottomCTA
+  useEffect(() => {
+    const handleShowForm = () => {
+      if (!journeyPath) {
+        playWhoosh()
+        haptic('heavy')
+        setJourneyPath('check')
+      }
+    }
+
+    window.addEventListener('showEligibilityForm', handleShowForm)
+    return () => window.removeEventListener('showEligibilityForm', handleShowForm)
+  }, [journeyPath, playWhoosh])
 
   // Detect user's location on mount - only show prompt if we get a valid residential address
   useEffect(() => {
@@ -257,8 +383,12 @@ function Hero() {
   // Initialize Google Places Autocomplete
   // Re-runs when input becomes visible (questionStep 1 and no detectedAddress)
   useEffect(() => {
-    // Only initialize when the input is actually visible
+    // Only initialize when the input is actually visible (journeyPath set on mobile, or always on desktop)
     if (!mapsLoaded || detectedAddress || questionStep !== 1) return
+
+    // On mobile, wait for journeyPath to be set before initializing
+    const isMobile = window.innerWidth <= 768
+    if (isMobile && !journeyPath) return
 
     // Small delay to ensure DOM is ready after state change
     const timer = setTimeout(() => {
@@ -293,7 +423,7 @@ function Hero() {
       } catch (err) {
         console.warn('Failed to initialize autocomplete:', err)
       }
-    }, 50)
+    }, 100) // Slightly longer delay to ensure DOM is ready
 
     return () => {
       clearTimeout(timer)
@@ -301,7 +431,7 @@ function Hero() {
         window.google.maps.event.clearInstanceListeners(autocompleteRef.current)
       }
     }
-  }, [mapsLoaded, handlePlaceSelect, detectedAddress, questionStep])
+  }, [mapsLoaded, handlePlaceSelect, detectedAddress, questionStep, journeyPath])
 
   // Step 1: Check eligibility with just address
   const handleCheckEligibility = async (e) => {
@@ -360,6 +490,8 @@ function Hero() {
       })
 
       if (result.success) {
+        playSuccess()
+        haptic('heavy')
         setStep(4) // Success
       }
     } catch (error) {
@@ -456,6 +588,8 @@ function Hero() {
 
   // Handle advancing to next question
   const handleNextQuestion = (field, value) => {
+    playTap()
+    haptic()
     setFormData(prev => ({ ...prev, [field]: value }))
     if (questionStep < 4) {
       setQuestionStep(questionStep + 1)
@@ -1164,10 +1298,13 @@ function Hero() {
         Skip for now, I'll call you
       </button>
 
-      {/* Trust reinforcement */}
+      {/* Solrite branding */}
       <div className="schedule-trust">
-        <Shield size={14} />
-        <span>BBB Accredited • Licensed & Insured • No Obligation</span>
+        <div className="solrite-badge">
+          <Star size={12} fill="#00D4AA" stroke="#00D4AA" />
+          <span>4.9</span>
+        </div>
+        <span>Solrite Energy • 500+ 5-Star Reviews</span>
       </div>
 
       <button type="button" className="back-btn" onClick={() => setStep(2)}>
@@ -1232,7 +1369,8 @@ function Hero() {
 
       <div className="container">
         <div className="hero-grid">
-          <div className="hero-content">
+          {/* Desktop: Original content */}
+          <div className="hero-content hero-content-desktop" onClick={() => scrollToSection('hero-form')} role="button" tabIndex={0}>
             <div className="hero-badge">
               <Zap size={16} />
               <span>Federal Energy Community Program</span>
@@ -1277,11 +1415,97 @@ function Hero() {
             </div>
           </div>
 
+          {/* Mobile: EPIC Hero - Shouting from the mountain */}
+          <div className="hero-content hero-content-mobile">
+            {/* Animated shapes */}
+            <div className="hero-shape-1"></div>
+            <div className="hero-shape-2"></div>
+            <div className="hero-accent-line"></div>
+
+            {!journeyPath ? (
+              // Epic Landing - The Mountain Top
+              <div className="epic-hero">
+                <div className="epic-eyebrow">
+                  <Zap size={14} />
+                  <span>FEDERAL ENERGY PROGRAM</span>
+                </div>
+
+                <div className="epic-value">
+                  <span className="epic-amount">$60,000</span>
+                  <span className="epic-label">Battery System</span>
+                </div>
+
+                <h1 className="epic-headline">
+                  Yours for <span>$0</span><br />
+                  if you qualify
+                </h1>
+
+                <p className="epic-subtitle">
+                  Texas homeowners in qualifying zip codes get a Sonnen battery installed free through a federal tax credit program.
+                </p>
+
+                <div className="epic-cta">
+                  <button
+                    className="epic-btn"
+                    onClick={() => { playWhoosh(); haptic('heavy'); setJourneyPath('check'); }}
+                  >
+                    <span>Check My Address</span>
+                    <ArrowRight size={22} />
+                  </button>
+                </div>
+
+                <div className="epic-features">
+                  <div className="epic-feature">
+                    <div className="epic-feature-icon">
+                      <Zap size={22} />
+                    </div>
+                    <div className="epic-feature-text">
+                      <span className="epic-feature-title">Whole-Home Backup</span>
+                      <span className="epic-feature-desc">Power through any outage</span>
+                    </div>
+                  </div>
+                  <div className="epic-feature">
+                    <div className="epic-feature-icon">
+                      <DollarSign size={22} />
+                    </div>
+                    <div className="epic-feature-text">
+                      <span className="epic-feature-title">$0 Out of Pocket</span>
+                      <span className="epic-feature-desc">Federal tax credit covers it</span>
+                    </div>
+                  </div>
+                  <div className="epic-feature">
+                    <div className="epic-feature-icon">
+                      <Shield size={22} />
+                    </div>
+                    <div className="epic-feature-text">
+                      <span className="epic-feature-title">10-Year Warranty</span>
+                      <span className="epic-feature-desc">Premium Sonnen system</span>
+                    </div>
+                  </div>
+                </div>
+
+                <p className="epic-trust">
+                  <strong>2,847</strong> Texas homes enrolled this month
+                </p>
+              </div>
+            ) : (
+              // Form appears after CTA click
+              <div className="epic-form-intro">
+                <button className="epic-back" onClick={() => { playTap(); haptic(); setJourneyPath(null); }}>
+                  ← Back
+                </button>
+              </div>
+            )}
+          </div>
+
           <div className="hero-form-container" id="hero-form">
-            {step === 1 && renderAddressStep()}
-            {step === 2 && renderContactStep()}
-            {step === 3 && renderScheduleStep()}
-            {step === 4 && renderSuccess()}
+            {/* Show form only after journey selection on mobile, or always on desktop */}
+            <div className={`hero-form-wrapper ${!journeyPath ? 'mobile-hidden' : ''}`}>
+              {step === 1 && renderAddressStep()}
+              {step === 2 && renderContactStep()}
+              {step === 3 && renderScheduleStep()}
+              {step === 4 && renderSuccess()}
+            </div>
           </div>
         </div>
       </div>

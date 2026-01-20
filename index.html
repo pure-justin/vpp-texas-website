@@ -3,14 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
 
-    <!-- Mobile Web App Meta Tags -->
+    <!-- Mobile Web App Meta Tags - Native App Feel -->
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <meta name="apple-mobile-web-app-title" content="VPP Texas" />
     <meta name="format-detection" content="telephone=no" />
+    <meta name="HandheldFriendly" content="true" />
+
+    <!-- Prevent gestures and zoom -->
+    <meta name="text-size-adjust" content="100%" />
 
     <!-- SEO Meta Tags -->
     <title>VPP Texas | Free Home Battery Backup & Lower Electric Bills</title>
@@ -29,13 +33,14 @@
     <meta name="twitter:title" content="VPP Texas | Free Home Battery Backup" />
     <meta name="twitter:description" content="Get a FREE home battery system and lower your electricity rates." />
 
-    <!-- Fonts -->
+    <!-- Fonts - Modern display + body fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Theme Color -->
-    <meta name="theme-color" content="#00D4AA" />
+    <!-- Theme Color - matches hero background -->
+    <meta name="theme-color" content="#1A1A2E" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#1A1A2E" media="(prefers-color-scheme: dark)" />
 
     <!-- Google Maps Places API - loaded dynamically via React -->
   </head>
